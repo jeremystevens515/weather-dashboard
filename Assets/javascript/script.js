@@ -2,8 +2,8 @@
 var APIkey = '&appid=47321296effd62eab8d0754b0a9e9a55'
 var openWeatherAPI ='https://api.openweathermap.org/'
 // var geoCodingAPI = 'https://api.openweathermap.org/geo/1.0/direct?q=' + cityname + '&limit=5&appid=47321296effd62eab8d0754b0a9e9a55';
-var currentWeatherAPI = openWeatherAPI + 'data/2.5/weather?lat={lat}&lon={lon}' + APIkey;
-var fiveDayForecast = openWeatherAPI + 'data/2.5/forecast?lat={lat}&lon={lon}' + APIkey;
+// var currentWeatherAPI = 'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid=47321296effd62eab8d0754b0a9e9a55';
+// var fiveDayForecast = 'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=47321296effd62eab8d0754b0a9e9a55';
 
 // DOM selection
 var searchCitiesInputEl = document.querySelector('#search-cities');
@@ -29,13 +29,50 @@ function getGeoCode(cityname) {
             console.log('latitude ' + latitude);
             var longitude = data[0].lon;
             console.log('longitude ' + longitude);
+
+            // TODO: add search history
+
+            getCurrentConditions(latitude,longitude);
+            getFiveDayForecast(latitude,longitude);
         });
-    
-    getCurrentConditions(latitude, longitude)
 }
 
-function getCurrentConditions(lat, lon) {
+function getCurrentConditions(lat,lon) {
+    var currentWeatherURL = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&appid=47321296effd62eab8d0754b0a9e9a55&units=imperial'
+    fetch(currentWeatherURL)
+        .then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            console.log('Current Conditions \n-----------')
+            console.log(data);
+            var temp = data.main.temp;
+            console.log('temp is ' + temp);
+            var wind = data.wind.speed;
+            console.log('wind speed is ' + wind + ' mph');
+            var humidity = data.main.humidity;
+            console.log('humidity is ' + humidity + ' %');
 
+            // TODO: populate html elements
+
+        });
 }
 
+function getFiveDayForecast(lat,lon) {
+    var fiveDayURL = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + '&appid=47321296effd62eab8d0754b0a9e9a55&units=imperial'
+    fetch(fiveDayURL)
+        .then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            console.log('Five Day Forecast \n---------')
+            console.log(data);
+            for (var i = 4; i < data.list.length; i = i + 8) {
+                console.log(data.list[i]);
+                var date = dayjs(data.list[i].dt_txt).format('M/D/YYYY');
+                console.log(date);
+                var temp = data.list[i].main.temp + ' &#8457';
+                var wind = data.list[i].wind.speed + ' Mph';
+                var humidity = data.list[i].main.humidity + ' %';
+            }
+        })
+}
 searchButtonEl.addEventListener('click', getSearchValue);
