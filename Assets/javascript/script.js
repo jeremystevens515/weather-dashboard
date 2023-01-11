@@ -73,6 +73,7 @@ function searchFromHistory(event) {
     console.log(event.target.innerHTML);
     var city = event.target.innerHTML;
     cityNameEl.textContent = city;
+    lastUpdated.textContent = dayjs().format('hh:mm a');
     clearCards();
     getGeoCode(city);
 }
