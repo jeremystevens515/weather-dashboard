@@ -20,4 +20,4 @@ THEN I am again presented with current and future conditions for that city
 ![The weather app includes a search option, a list of cities, and a five-day forecast and current weather conditions for Atlanta.](./Assets/images/weather-dashboard-screenshot.JPG)
 
 ## GitHub Pages Deployment
-https://jeremystevens515.github.io/weather-dashboard/)
+https://jeremystevens515.github.io/weather-dashboard/
