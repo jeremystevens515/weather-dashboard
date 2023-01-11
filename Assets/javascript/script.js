@@ -72,7 +72,48 @@ function getFiveDayForecast(lat,lon) {
                 var temp = data.list[i].main.temp + ' &#8457';
                 var wind = data.list[i].wind.speed + ' Mph';
                 var humidity = data.list[i].main.humidity + ' %';
+                createCard(date,temp,wind,humidity);
             }
         })
 }
+
+function createCard(date,temp,wind,humidity) {
+    var divContainer = document.createElement('div');
+    divContainer.setAttribute('class', 'card m-2');
+
+    var divCardBody = document.createElement('div');
+    divCardBody.setAttribute('class', 'card-body');
+
+    var cardTitle = document.createElement('h5');
+    cardTitle.setAttribute('class', 'card-title');
+    cardTitle.textContent = date;
+
+    var predictedConditions = document.createElement('div');
+    
+    var predictedTemp = document.createElement('p');
+    predictedTemp.setAttribute('class', 'card-text');
+    predictedTemp.textContent = temp;
+
+    var predictedWind = document.createElement('p');
+    predictedWind.setAttribute('class', 'card-text');
+    predictedWind.textContent = wind;
+
+    var predictedHumidity = document.createElement('p');
+    predictedHumidity.setAttribute('class', 'card-text');
+    predictedHumidity.textContent = humidity;
+
+    predictedConditions.appendChild(predictedTemp);
+    predictedConditions.appendChild(predictedWind);
+    predictedConditions.appendChild(predictedHumidity);
+
+    divCardBody.appendChild(cardTitle);
+    divCardBody.appendChild(predictedConditions);
+
+    divContainer.appendChild(divCardBody);
+
+    // TODO: figure out why this selector does not work with custom attributes
+    var fiveDayContainer = document.querySelector('.card-group');
+    fiveDayContainer.appendChild(divContainer);
+}
+
 searchButtonEl.addEventListener('click', getSearchValue);
