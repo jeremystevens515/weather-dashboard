@@ -2,11 +2,6 @@
 var APIkey = '&appid=47321296effd62eab8d0754b0a9e9a55'
 var openWeatherAPI ='https://api.openweathermap.org/'
 var previousSearches = [];
-var sunny = '☀️';
-var partlyCloudy = '⛅';
-var cloudy = '☁️';
-var raining = '🌧️';
-var snowing = '❄️';
 
 // DOM selection
 var cityNameEl = document.querySelector('#city-name');
