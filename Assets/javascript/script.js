@@ -2,6 +2,11 @@
 var APIkey = '&appid=47321296effd62eab8d0754b0a9e9a55'
 var openWeatherAPI ='https://api.openweathermap.org/'
 var previousSearches = [];
+var sunny = '☀️';
+var partlyCloudy = '⛅';
+var cloudy = '☁️';
+var raining = '🌧️';
+var snowing = '❄️';
 
 // DOM selection
 var cityNameEl = document.querySelector('#city-name');
@@ -9,12 +14,12 @@ var lastUpdated = document.querySelector('#last-updated');
 var searchCitiesInputEl = document.querySelector('#search-cities');
 var searchButtonEl = document.querySelector('#search-button');
 var searchHistoryEl = document.querySelector('#search-history')
-var currentCityOverview = document.querySelector('#current-city-overview'); // selector not working with id
+var currentCityOverview = document.querySelector('#current-city-overview');
+var weatherIconEl = document.querySelector('#icon');
 var currentTemp = document.querySelector('#current-temp');
 var currentWind = document.querySelector('#current-wind');
 var currentHumidity = document.querySelector('#current-humidity');
 
-// var fiveDayContainer = document.querySelector('#five-days');
 
 // get search value
 function getSearchValue(event) {
@@ -28,7 +33,7 @@ function getSearchValue(event) {
     addToHistory(city);
     getGeoCode(city)
 }
-
+// function to clear 5 day forecast to prevent duplicates
 function clearCards() {
     var fiveDayContainer = document.querySelector('#five-days');
     var child = fiveDayContainer.lastElementChild
@@ -37,7 +42,7 @@ function clearCards() {
         child = fiveDayContainer.lastElementChild
     }
 }
-
+// function to add search history as an array to local storage
 function addToHistory(textInput) {
     previousSearches.push(textInput);
     localStorage.setItem('previousSearches', JSON.stringify(previousSearches));
@@ -49,11 +54,11 @@ function addToHistory(textInput) {
     searchHistoryEl.appendChild(historyBtn);
 
 }
-
+// displays history under search bar if values exist in local storage
 function displayHistory() {
     var getHistory = JSON.parse(localStorage.getItem('previousSearches'));
     console.log(getHistory);
-    
+    if (getHistory) {
         for (var i = 0; i < getHistory.length; i++) {
             var historyBtn = document.createElement('button');
             historyBtn.setAttribute('class', 'btn text-secondary text-start');
@@ -61,8 +66,9 @@ function displayHistory() {
             historyBtn.textContent = getHistory[i];
             searchHistoryEl.appendChild(historyBtn);
         }
+    }
 }
-
+// searches based on a click in the search history
 function searchFromHistory(event) {
     console.log(event.target.innerHTML);
     var city = event.target.innerHTML;
@@ -70,7 +76,6 @@ function searchFromHistory(event) {
     clearCards();
     getGeoCode(city);
 }
-
 // get latitude and longitude based on city name
 function getGeoCode(cityName) {
     var geoCodingURL = 'https://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit=5&appid=47321296effd62eab8d0754b0a9e9a55'
@@ -88,7 +93,7 @@ function getGeoCode(cityName) {
             getFiveDayForecast(latitude,longitude);
         });
 }
-
+// uses latitude and longitude aquired in getGeoCode to get current conditions
 function getCurrentConditions(city,lat,lon) {
     var currentWeatherURL = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&appid=47321296effd62eab8d0754b0a9e9a55&units=imperial'
     fetch(currentWeatherURL)
@@ -98,6 +103,7 @@ function getCurrentConditions(city,lat,lon) {
             console.log('Current Conditions \n-----------')
             console.log(data);
             var description = data.weather[0].main;
+            var icon = data.weather[0].icon
             var temp = data.main.temp + '℉';
             var wind = data.wind.speed + ' mph';
             var humidity = data.main.humidity + '%';
@@ -108,9 +114,20 @@ function getCurrentConditions(city,lat,lon) {
             currentWind.textContent = 'Wind: ' + wind;
             currentHumidity.textContent = 'Humidity: ' + humidity;
 
+            getIcon(icon, description, currentCityOverview);
+
         });
 }
 
+function getIcon(icon, description, parentElement) {
+    var iconURL = 'http://openweathermap.org/img/wn/' + icon + '@2x.png';
+    var imgEl = document.createElement('img')
+    imgEl.setAttribute('src', iconURL);
+    imgEl.setAttribute('alt', description)
+
+    parentElement.appendChild(imgEl);
+}
+// uses latitude and longitude aquired in getGeoCode to get forecast
 function getFiveDayForecast(lat,lon) {
 
     var fiveDayURL = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + '&appid=47321296effd62eab8d0754b0a9e9a55&units=imperial'
@@ -127,12 +144,14 @@ function getFiveDayForecast(lat,lon) {
                 var temp = data.list[i].main.temp + '℉';
                 var wind = data.list[i].wind.speed + ' mph';
                 var humidity = data.list[i].main.humidity + '%';
-                createCard(date,temp,wind,humidity);
+                var icon = data.list[i].weather[0].icon;
+                var description = data.list[i].weather[0].description;
+                createCard(date,temp,wind,humidity,icon, description);
             }
         })
 }
-
-function createCard(date,temp,wind,humidity) {
+// function to create and populate elements for forecast
+function createCard(date,temp,wind,humidity, icon, description) {
     var divContainer = document.createElement('div');
     divContainer.setAttribute('class', 'card m-2');
 
@@ -169,6 +188,8 @@ function createCard(date,temp,wind,humidity) {
     // TODO: figure out why this selector does not work with custom attributes
     var fiveDayContainer = document.querySelector('#five-days');
     fiveDayContainer.appendChild(divContainer);
+
+    getIcon(icon, description, cardTitle);
 }
 
 
